@@ -1,5 +1,5 @@
-import { GoogleMetadata } from '../models/google-metadata';
 import { promises as fspromises } from "fs"
+import { GoogleMetadata } from '../models/google-metadata';
 import { MediaFileInfo } from '../models/media-file-info'
 
 const { readFile } = fspromises;
@@ -16,7 +16,7 @@ export async function readPhotoTakenTimeFromGoogleJson(mediaFile: MediaFileInfo)
     const photoTakenTimestamp = parseInt(googleJsonMetadata.photoTakenTime.timestamp, 10);
     const photoTakenDate = new Date(photoTakenTimestamp * 1000);
     return photoTakenDate.toISOString();
-  } else {
+  } 
     return null;
-  }
+  
 }

@@ -1,5 +1,4 @@
-import { Command, flags } from '@oclif/command';
-import * as Parser from '@oclif/parser';
+import { Command, Flags } from '@oclif/core';
 import { existsSync, promises as fspromises } from 'fs';
 import { CONFIG } from './config';
 import { doesFileHaveExifDate } from './helpers/does-file-have-exif-date';
@@ -11,37 +10,40 @@ import { Directories } from './models/directories'
 
 const { readdir, mkdir, copyFile } = fspromises;
 
-class GooglePhotosExif extends Command {
+export default class GooglePhotosExif extends Command {
   static description = `Takes in a directory path for an extracted Google Photos Takeout. Extracts all photo/video files (based on the conigured list of file extensions) and places them into an output directory. All files will have their modified timestamp set to match the timestamp specified in Google's JSON metadata files (where present). In addition, for file types that support EXIF, the EXIF "DateTimeOriginal" field will be set to the timestamp from Google's JSON metadata, if the field is not already set in the EXIF metadata.`;
 
   static flags = {
-    version: flags.version({char: 'v'}),
-    help: flags.help({char: 'h'}),
-    inputDir: flags.string({
+    version: Flags.version(),
+    help: Flags.help(),
+    inputDir: Flags.string({
       char: 'i',
       description: 'Directory containing the extracted contents of Google Photos Takeout zip file',
       required: true,
     }),
-    outputDir: flags.string({
+    outputDir: Flags.string({
       char: 'o',
       description: 'Directory into which the processed output will be written',
       required: true,
     }),
-    errorDir: flags.string({
+    errorDir: Flags.string({
       char: 'e',
       description: 'Directory for any files that have bad EXIF data - including the matching metadata files',
       required: true,
     }),
   }
 
-  static args: Parser.args.Input  = []
-
   async run() {
-    const { args, flags} = this.parse(GooglePhotosExif);
+    const { args, flags} = await this.parse(GooglePhotosExif);
     const { inputDir, outputDir, errorDir } = flags;
 
     try {
-      const directories = this.determineDirectoryPaths(inputDir, outputDir, errorDir);
+      const directories = {
+        input: inputDir,
+        output: outputDir,
+        error: errorDir,
+      };
+      
       await this.prepareDirectories(directories);
       await this.processMediaFiles(directories);
     } catch (error) {
@@ -51,14 +53,6 @@ class GooglePhotosExif extends Command {
 
     this.log('Done 🎉');
     this.exit(0);
-  }
-
-  private determineDirectoryPaths(inputDir: string, outputDir: string, errorDir: string): Directories {
-    return {
-      input: inputDir,
-      output: outputDir,
-      error: errorDir,
-    };
   }
 
   private async prepareDirectories(directories: Directories): Promise<void> {
@@ -151,5 +145,3 @@ class GooglePhotosExif extends Command {
     }
   }
 }
-
-export = GooglePhotosExif

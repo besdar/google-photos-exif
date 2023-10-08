@@ -1,30 +1,31 @@
 {
   "name": "google-photos-exif",
   "description": "A tool to populate missing DateTimeOriginal EXIF metadata in Google Photos takeout, using Google's JSON metadata.",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "Matt Wilson @mattwilson1024",
   "bin": {
     "google-photos-exif": "./bin/run"
   },
   "bugs": "https://github.com/mattwilson1024/google-photos-exif/issues",
   "dependencies": {
-    "@oclif/command": "^1",
-    "@oclif/config": "^1",
-    "@oclif/plugin-help": "^3",
-    "exiftool-vendored": "^12.1.0",
-    "tslib": "^1"
+    "@oclif/core": "^3.0.3",
+    "exiftool-vendored": "^23.3.0"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1",
-    "@types/node": "^10",
-    "eslint": "^5.13",
-    "eslint-config-oclif": "^3.1",
-    "eslint-config-oclif-typescript": "^0.1",
-    "ts-node": "^8",
-    "typescript": "^3.3"
+    "@types/node": "^20.5.9",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.8.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
   },
   "engines": {
-    "node": ">=10.1.0"
+    "node": ">=18.18.0"
   },
   "files": [
     "/bin",
@@ -41,7 +42,7 @@
   },
   "repository": "mattwilson1024/google-photos-exif",
   "scripts": {
-    "posttest": "eslint . --ext .ts --config .eslintrc",
+    "eslint:fix": "eslint --fix --ext .ts ./src && prettier --write src/",
     "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
     "test": "echo NO TESTS",
     "version": "oclif-dev readme && git add README.md",

@@ -1,8 +1,8 @@
 import { exiftool } from 'exiftool-vendored';
-import { doesFileSupportExif } from './does-file-support-exif';
 import { promises as fspromises } from 'fs';
-import { MediaFileInfo } from '../models/media-file-info';
 import { resolve } from 'path';
+import { doesFileSupportExif } from './does-file-support-exif';
+import { MediaFileInfo } from '../models/media-file-info';
 
 const { unlink, copyFile } = fspromises;
 

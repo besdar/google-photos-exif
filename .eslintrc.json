@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "root": true,
+  "rules": {
+    "import/extensions": [
+      "error",
+      {
+        "ts": "never"
+      }
+    ]
+  },
+  "import/no-unresolved": "off"
+}

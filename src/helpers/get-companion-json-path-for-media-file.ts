@@ -24,8 +24,8 @@ export function getCompanionJsonPathForMediaFile(mediaFilePath: string): string|
   // We can use a regex to look for this edge case and add that to the potential JSON filenames to look out for
   const nameWithCounterMatch = mediaFileNameWithoutExtension.match(/(?<name>.*)(?<counter>\(\d+\))$/);
   if (nameWithCounterMatch) {
-    const name = nameWithCounterMatch?.groups?.['name'];
-    const counter = nameWithCounterMatch?.groups?.['counter'];
+    const name = nameWithCounterMatch?.groups?.name;
+    const counter = nameWithCounterMatch?.groups?.counter;
     potentialJsonFileNames.push(`${name}${mediaFileExtension}${counter}.json`);
   }
 
