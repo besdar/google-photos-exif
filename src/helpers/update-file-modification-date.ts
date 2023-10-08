@@ -1,8 +1,6 @@
 import { closeSync, openSync, utimesSync } from 'fs'
 
-export async function updateFileModificationDate(filePath: string, timeTaken: string): Promise<void> {
-  const time = new Date(timeTaken);
-
+export async function updateFileModificationDate(filePath: string, time: Date): Promise<void> {
   try {
     utimesSync(filePath, time, time);
   } catch (error) {

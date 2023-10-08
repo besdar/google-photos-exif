@@ -1,4 +1,4 @@
-import { exiftool } from 'exiftool-vendored';
+import { APP1Tags, exiftool } from 'exiftool-vendored';
 import { promises as fspromises } from 'fs';
 import { resolve } from 'path';
 import { doesFileSupportExif } from './does-file-support-exif';
@@ -6,15 +6,13 @@ import { MediaFileInfo } from '../models/media-file-info';
 
 const { unlink, copyFile } = fspromises;
 
-export async function updateExifMetadata(fileInfo: MediaFileInfo, timeTaken: string, errorDir: string): Promise<void> {
+export async function updateExifMetadata(fileInfo: MediaFileInfo, metadata: APP1Tags, errorDir: string): Promise<void> {
   if (!doesFileSupportExif(fileInfo.outputFilePath)) {
     return;
   }
 
   try {
-    await exiftool.write(fileInfo.outputFilePath, {
-      DateTimeOriginal: timeTaken,
-    });
+    await exiftool.write(fileInfo.outputFilePath, metadata);
   
     await unlink(`${fileInfo.outputFilePath}_original`); // exiftool will rename the old file to {filename}_original, we can delete that
 
