@@ -1,5 +1,5 @@
 export interface Directories {
-  input: string;
-  output: string;
-  error: string;
+  inputDir: string;
+  outputDir?: string | null;
+  errorDir?: string | null;
 }

@@ -1,28 +1,27 @@
 import { promises as fspromises } from "fs";
 import { GoogleMetadata } from "../models/google-metadata";
-import { MediaFileInfo } from "../models/media-file-info";
+import { ProtoFile } from "../models/media-file-info";
 import { Tags } from "exiftool-vendored";
 
 const { readFile } = fspromises;
 
-export async function readMetadataFromGoogleJson(mediaFile: MediaFileInfo): Promise<[Tags | null, Date | null]> {
-    if (!mediaFile.jsonFilePath || !mediaFile.jsonFileExists) {
-        return [null, null];
-    }
+export async function readMetadataFromGoogleJson(jsonFile: ProtoFile): Promise<Tags> {
+    const jsonContents = await readFile(jsonFile.path, "utf8");
+    const googleJsonMetadata = JSON.parse(jsonContents) as Partial<GoogleMetadata>;
 
     let metadata: Tags = {};
-    let timeTaken: Date | null = null;
-    const jsonContents = await readFile(mediaFile.jsonFilePath, "utf8");
-    const googleJsonMetadata = JSON.parse(jsonContents) as GoogleMetadata;
-
     if (googleJsonMetadata?.photoTakenTime?.timestamp) {
-        const photoTakenTimestamp = parseInt(googleJsonMetadata.photoTakenTime.timestamp, 10);
-        timeTaken = new Date(photoTakenTimestamp * 1000);
+        const photoTakenTimestamp = Number(googleJsonMetadata.photoTakenTime.timestamp + '000');
+        const timeTaken = new Date(photoTakenTimestamp);
         metadata.DateTimeOriginal = timeTaken.toISOString();
     }
 
-    if (googleJsonMetadata?.geoData?.altitude != 0 || googleJsonMetadata?.geoData?.latitude != 0 || googleJsonMetadata?.geoData?.longitude != 0) {
-        const geoData = googleJsonMetadata.geoData;
+    let geoData = googleJsonMetadata.geoData;
+    if (!geoData || geoData.altitude === 0 || geoData.latitude === 0 || geoData.longitude === 0) {
+        geoData = googleJsonMetadata.geoDataExif;
+    }
+
+    if (geoData && (geoData.altitude !== 0 || geoData.latitude !== 0 || geoData.longitude !== 0)) {
         metadata.GPSAltitude = geoData.altitude;
         if (geoData.latitude >= 0) {
             metadata.GPSLatitude = geoData.latitude;
@@ -31,6 +30,7 @@ export async function readMetadataFromGoogleJson(mediaFile: MediaFileInfo): Prom
             metadata.GPSLatitude = -geoData.latitude;
             metadata.GPSLatitudeRef = "S";
         }
+
         if (geoData.longitude >= 0) {
             metadata.GPSLongitude = geoData.longitude;
             metadata.GPSLongitudeRef = "E";
@@ -40,5 +40,5 @@ export async function readMetadataFromGoogleJson(mediaFile: MediaFileInfo): Prom
         }
     }
 
-    return [metadata, timeTaken];
+    return metadata;
 }

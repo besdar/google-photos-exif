@@ -1,13 +1,11 @@
+export type ProtoFile = {
+  name: string,
+  extension: string,
+  path: string
+}
+
 export interface MediaFileInfo {
-  mediaFilePath: string;
-  mediaFileName: string;
-  mediaFileExtension: string;
-  supportsExif: boolean;
-
-  jsonFilePath: string|null;
-  jsonFileName: string|null;
-  jsonFileExists: boolean;
-
-  outputFileName: string;
-  outputFilePath: string;
+  mediaFile: ProtoFile;
+  jsonFile?: ProtoFile | null;
+  outputFile?: ProtoFile | null;
 }

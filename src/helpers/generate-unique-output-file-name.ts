@@ -1,5 +1,7 @@
 import { basename, extname } from 'path';
 
+const allUsedFileNamesLowerCased: string[] = [];
+
 /**
  * Given the name of a file that we want to copy to the output directory, generate a unique output filename.
  * The function takes in the filename that we wish to copy and an array of all output files so far (all converted to lower case).
@@ -11,7 +13,7 @@ import { basename, extname } from 'path';
  *
  * For example if the array contains `picture.jpg` and `picture_1.jpg` then this will return `picture_2.jpg`
  */
-export function generateUniqueOutputFileName(filePath: string, allUsedFileNamesLowerCased: string[]): string {
+export function generateUniqueOutputFileName(filePath: string): string {
   const originalFileName = basename(filePath);
   const originalFileExtension = extname(filePath);
   const originalFileNameWithoutExtension = basename(filePath, originalFileExtension);
@@ -22,5 +24,8 @@ export function generateUniqueOutputFileName(filePath: string, allUsedFileNamesL
     outputFileName = `${originalFileNameWithoutExtension}_${counter}${originalFileExtension}`;
     counter++;
   }
+
+  allUsedFileNamesLowerCased.push(outputFileName.toLowerCase());
+
   return outputFileName;
 }

@@ -1,16 +1,31 @@
-import { extname } from 'path';
-import { getAllFilesRecursively } from './get-all-files-recursively';
+import { extname, resolve } from "path";
+import { CONFIG } from "../config";
+import { promises as fspromises } from "fs";
 
-export async function findFilesWithExtensionRecursively(dirToSearch: string, extensionsToInclude: string[]): Promise<string[]> {
-  const allFiles = await getAllFilesRecursively(dirToSearch);
-  const dirIsEmpty = allFiles.length === 0;
-  if (dirIsEmpty) {
-    throw new Error('The search directory is empty, so there is no work to do. Check that your --inputDir contains all of the Google Takeout data, and that any zips have been extracted before running this tool');
-  }
+const { readdir } = fspromises;
 
-  const matchingFiles = allFiles.filter(filePath => {
-    const extension = extname(filePath).toLowerCase();
-    return extensionsToInclude.map(ext => ext.toLowerCase()).includes(extension.toLowerCase());
-  });
-  return matchingFiles;
+async function getAllFilesRecursively(dir: string): Promise<string[]> {
+    const directoryEntries = await readdir(dir, { withFileTypes: true });
+    const files = await Promise.all(
+        directoryEntries.map((directoryEntry) => {
+            const res = resolve(dir, directoryEntry.name);
+            return directoryEntry.isDirectory() ? getAllFilesRecursively(res) : [res];
+        }),
+    );
+
+    return files.flat();
+}
+
+export async function findFilesWithExtensionRecursively(dirToSearch: string): Promise<string[]> {
+    const matchingFiles = (await getAllFilesRecursively(dirToSearch)).filter((filePath) =>
+        CONFIG.supportedMediaFileExtensions.includes(extname(filePath).toLowerCase()),
+    );
+
+    if (matchingFiles.length === 0) {
+        throw new Error(
+            "The search directory is empty, so there is no work to do. Check that your --inputDir contains all of the Google Takeout data, and that any zips have been extracted before running this tool",
+        );
+    }
+
+    return matchingFiles;
 }

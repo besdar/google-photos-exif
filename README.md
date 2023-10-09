@@ -20,10 +20,8 @@ A tool to populate missing `DateTimeOriginal` and *geo location* EXIF metadata i
 Example usage:
 
 ```
-yarn
-yarn start --inputDir ~/takeout --outputDir ~/output --errorDir ~/error
+npm i && npm run start -- --inputDir="~/takeout" --outputDir="~/output" --errorDir="~/error" --mockProcess
 ```
-
 
 ## Background
 
@@ -41,9 +39,9 @@ This tool aims to eliminate some of those issues by reading the `photoTakenTime`
 
 ## Structure of Google Takeout export
 
-At the time of writing (October 2020), Google Takeout provides you with one or more zip files, structured in a way that is fairly unintuitive and tricky to make use of directly.
+At the time of writing (October 2020), Google Takeout provides you with one or more zip files, structured in a way that is fairly unintuitive and tricky to use of directly.
 
-Extracting the zip, you might find something similar to this: 
+Extracting the zip, you might find something similar to this (It's OK if your folder structure looks different): 
 
 ```
 Extracted Takeout Zip
@@ -95,42 +93,18 @@ The first step to using this tool is to request & download a `Google Takeout`. A
 
 The tool takes in three parameters:
 
-1. an `inputDir` directory path containing the extracted Google Takeout.
-2. an `outputDir` directory path where processed files will be moved to. This needs to be an empty directory and can be anywhere on the disk. 
-3. an `errorDir` directory path where images with bad EXIF data that fail to process will be moved to. The folder can be empty.
+1. an `inputDir` directory path containing the extracted Google Takeout. Required.
+2. an `outputDir` directory path where processed files will be moved to.
+3. an `errorDir` directory path where images with bad EXIF data that fail to process will be moved to.
+4. a `mockProcess` boolean parameter which allows the script to run on your files without any modification. It can help you to be sure that everything is going well.
 
 The `inputDir` needs to be a single directory containing an _extracted_ zip from Google takeout. As described in the section above, it is important that the zip has been extracted into a directory (this tool doesn't extract zips for you) and that it is a single folder containing the whole Takeout (or if coming from multiple archives, that they have been properly merged together). 
-
-For example:
-```
-Takeout
-  Google Photos
-    2017-04-03
-    2020-01-01
-    ...
-```
 
 ## Configuring supported file types
 
 In order to avoid touching files that are not photos or videos, this tool will only process files whose extensions are whitelisted in the configuration options. Any other files will be ignored and not included in the output.
 
 To customise which files are processed, edit the `src/config.ts` file to suit your needs. For each extension you can also configure whether or not to attempt to read/write EXIF metadata for that file type.
-
-The default configuration is as follows:
-```
-┌──────────┬─────────┐
-│Extension │EXIF     │
-├──────────┼─────────┤
-│.jpeg     │true     │
-│.jpg      │true     │
-│.heic     │true     │
-│.gif      │false    │
-│.mp4      │false    │
-│.png      │false    │
-│.avi      │false    │
-│.mov      │false    │
-└──────────┴─────────┘
-```
 
 ## What does the tool do?
 
@@ -141,15 +115,13 @@ The tool will do the following:
    
    a. Look for a corresponding sidecar JSON metadata file (see the section below for more on this) and if found, read the `photoTakenTime` field
    
-   b. Copy the media file to the output directory
-
-   c. Update the file modification date to the `photoTakenTime` found in the JSON metadata
+   b. Copy the media file to the output directory (if `outputDir` is present)
    
-   d. If the file supports EXIF (e.g. JPEG images), read the EXIF metadata and write the `DateTimeOriginal` and geo locations fields if it does not already have a value in this field 
+   c. If the file supports EXIF (e.g. JPEG images), read the EXIF metadata and write the `DateTimeOriginal` and geo locations fields if it does not already have a value in this field 
 
-   e. If an error occurs whilst processing the file, copy it to the directory specified in the `errorDir` argument, so that it can be inspected manually or removed
+   d. Update the file modification date to the `photoTakenTime` found in the JSON metadata or in EXIF metadata
 
-3. Display a summary of work completed
+   e. If an error occurs whilst processing the file, copy it to the directory specified in the `errorDir` argument (if present), so that it can be inspected manually or removed
 
 ## How are media files matched to JSON sidecar files?
 
@@ -187,4 +159,4 @@ I decided to make this public on GitHub because:
  - it was useful for me, so maybe it'll be useful for others in the future
  - future me might be thankful if I ever need to do this again
 
-With that said, please bear in mind that this tool won't be actively maintained and your mileage may vary. I'm sure it's far from perfect so if you choose to use it please proceed with caution and be careful to verify the results! I hope it's helpful.
+With that said, please bear in mind that this tool won't be actively maintained and your mileage may vary. I'm sure it's far from perfect so if you choose to use it please proceed with caution and be careful to verify the results (with `mockProcess` parameter)! I hope it's helpful.
