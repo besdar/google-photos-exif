@@ -17,6 +17,8 @@ export function getCompanionJsonPathForMediaFile(mediaFilePath: string): string|
   const potentialJsonFileNames: string[] = [
     `${mediaFileNameWithoutExtension}.json`,
     `${mediaFileNameWithoutExtension}${mediaFileExtension}.json`,
+    `${mediaFileNameWithoutExtension}.jpg.json`, // For videos that accompanied a motion photo
+    `${mediaFileNameWithoutExtension}.HEIC.json`, // For videos that accompanied a motion photo
   ];
 
   // Another edge case which seems to be quite inconsistent occurs when we have media files containing a number suffix for example "foo(1).jpg"
@@ -38,7 +40,10 @@ export function getCompanionJsonPathForMediaFile(mediaFilePath: string): string|
   // And sometimes the media filename has extra underscore in it (e.g. filename_.jpg + filename.json)
   const endsWithExtraUnderscore = mediaFileNameWithoutExtension.endsWith('_');
 
-  if (endsWithExtraDash || endsWithExtraNChar || endsWithExtraUnderscore) {
+  // Sometimes if the media filename is long enough, Google writes json filename without final symbol
+  const isFilenameLong = mediaFileNameWithoutExtension.length > 20;
+
+  if (endsWithExtraDash || endsWithExtraNChar || endsWithExtraUnderscore || isFilenameLong) {
     // We need to remove that extra char at the end
     potentialJsonFileNames.push(`${mediaFileNameWithoutExtension.slice(0, -1)}.json`);
   }

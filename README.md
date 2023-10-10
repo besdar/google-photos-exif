@@ -1,19 +1,17 @@
 # google-photos-exif
 
-A tool to populate missing `DateTimeOriginal` and *geo location* EXIF metadata in Google Photos takeout, using Google's JSON metadata.
+A tool to populate missing EXIF metadata (like `DateTimeOriginal`, geolocation) in Google Photos takeout, using Google's JSON metadata.
 
 ## Table of Contents
 
-* [Quick Start](#quick-start)
-* [Background](#background)
-* [Structure of Google Takeout Export](#structure-of-google-takeout-export)
-* [How to download Google Takeout content](#how-to-download-google-takeout-content)
-* [What inputs do I need to provide?](#what-inputs-do-i-need-to-provide)
-* [What does the tool do?](#what-does-the-tool-do)
-* [Supported file types](#supported-file-types)
-* [How are media files matched to JSON sidecar files?](#how-are-media-files-matched-to-json-sidecar-files)
-* [Disclaimer?](#disclaimer)
-
+-   [Quick Start](#quick-start)
+-   [How does this tool works?](#what-does-the-tool-do)
+-   [Background](#background)
+-   [Structure of Google Takeout Export](#structure-of-google-takeout-export)
+-   [How to download Google Takeout content](#how-to-download-google-takeout-content)
+-   [Supported file types](#supported-file-types)
+-   [How are media files matched to JSON sidecar files?](#how-are-media-files-matched-to-json-sidecar-files)
+-   [Disclaimer?](#disclaimer)
 
 ## Quick Start
 
@@ -23,25 +21,49 @@ Example usage:
 npm i && npm run start -- --inputDir="~/takeout" --outputDir="~/output" --errorDir="~/error" --mockProcess
 ```
 
+The tool takes in three parameters:
+
+1. an `inputDir` directory path containing the extracted Google Takeout. Required.
+2. an `outputDir` directory path where processed files will be moved to.
+3. an `errorDir` directory path where images with bad EXIF data that fail to process will be moved to.
+4. a `mockProcess` boolean parameter which allows the script to run on your files without any modification. It can help you make sure everything goes well.
+
+The `inputDir` needs to be a single directory containing an _extracted_ zip from Google takeout. As described in the section above, it is important that the zip has been extracted into a directory (this tool doesn't extract zips for you) and that it is a single folder containing the whole Takeout (or if coming from multiple archives, that they have been properly merged together).
+
+## How does this tool works?
+
+The tool will do the following:
+
+1. Find all "media files" with one of the supported extensions (see "Configuring supported file types" above) from the (nested) `inputDir` folder structure.
+
+2. For each "media file":
+
+    a. Look for a corresponding sidecar JSON metadata file (see the section below for more on this) and if found, read the `photoTakenTime` field
+
+    b. Copy the media file to the output directory (if `outputDir` is present)
+
+    c. If the file supports EXIF (e.g. JPEG images), read the EXIF metadata and write the `DateTimeOriginal` and geo locations fields if it does not already have a value in this field
+
+    d. Update the file modification date to the `photoTakenTime` found in the JSON metadata or in EXIF metadata
+
+    e. If an error occurs whilst processing the file, copy it to the directory specified in the `errorDir` argument (if present), so that it can be inspected manually or removed
+
 ## Background
 
 I wrote this tool to help me overcome some issues that I had when trying to make use of photos exported from Google Photos using [Google Takeout](https://takeout.google.com/).
 
-My goal was to extract all photos from my Google Photos account and incorporate them into a master photo library on my Mac. This library would be organised into a date-based folder structure, with images being automatically moved into the correct structure using [Silent Sifter](https://www.vector15.com/silentsifter/).
-
-Silent Sifter provides a fast way to organise images into folders based on the timestamps embedded in the image metadata or failing that, the file modification timestamps.  
-
-Whilst it is great that I was able to use Google Takeout to extract all of my stored images from Google Photos at once, I found that some images were landing in the wrong place due to missing `DateTimeOriginal` EXIF timestamps. 
+Whilst it is great that I was able to use Google Takeout to extract all of my stored images from Google Photos at once, I found that some images were landing in the wrong place due to missing `DateTimeOriginal` EXIF timestamps.
 
 This tool aims to eliminate some of those issues by reading the `photoTakenTime` timestamp from the JSON metadata files that are included in Google Takeout export and using it to:
-- set a meaningful modification date on the file itself
-- populate the `DateTimeOriginal` field in the EXIF metadata if this field is not already set 
+
+-   set a meaningful modification date on the file itself
+-   populate the `DateTimeOriginal` field in the EXIF metadata if this field is not already set
 
 ## Structure of Google Takeout export
 
 At the time of writing (October 2020), Google Takeout provides you with one or more zip files, structured in a way that is fairly unintuitive and tricky to use of directly.
 
-Extracting the zip, you might find something similar to this (It's OK if your folder structure looks different): 
+Extracting the zip, you might find something similar to this (It's OK if your folder structure looks different):
 
 ```
 Extracted Takeout Zip
@@ -69,7 +91,7 @@ There are some interesting challenges to note here:
 
 1. Each zip contains folders for certain dates and/or album names. These folders contain a mixture of image files and JSON metadata files. The JSON sidecar files include, amongst other things, a useful `photoTakenTime` property.
 2. The date based folders don't always contain perfect pairs of images and JSON files, sometimes you get JSON files without a corresponding image. In the case that the export was split across multiple zips, I'm not sure whether there is any guarantee that the images & JSON files will always be co-located within the same export
-3. The naming convention for the JSON files seems inconsistent and has some interesting edge cases. For an image named `IMG123.jpg`, sometimes you get `IMG123.jpg.json` but sometimes it's just `IMG123.json` 
+3. The naming convention for the JSON files seems inconsistent and has some interesting edge cases. For an image named `IMG123.jpg`, sometimes you get `IMG123.jpg.json` but sometimes it's just `IMG123.json`
 4. From what I can tell, the embedded metadata (e.g. EXIF / IPTC) in the image files is _not_ updated if changes are made within Google Photos, for example if the dates are updated using the Google Photos UI. Instead, Google's metadata comes out in the accompanying JSON files.
 5. Whilst most of my images contained reasonable EXIF timestamps for the time they were taken (written by the phone's camera), a small number did not. My guess is that these images originated from other sources (e.g. they were shared with me or imported into the library by other means, and the source did not include a timestamp in the EXIF metadata)
 6. Some file formats such as GIFs or MP4 videos don't have this metadata and thus also get sorted into the wrong place when run through tools that organise images based on the metadata timestamps.
@@ -81,47 +103,19 @@ The first step to using this tool is to request & download a `Google Takeout`. A
 1. Visit https://takeout.google.com/
 2. Deselect all products and then tick `Google Photos`
 3. Click `All photo albums included`.
-4. Keep all of the date-based albums selected. Deselect any "Hangout: *" albums unless you specifically want to include images from chats.
+4. Keep all of the date-based albums selected. Deselect any "Hangout: \*" albums unless you specifically want to include images from chats.
 5. **Important**: If you have custom albums (ones with non-date names), deselect these because the images will already be referenced by the date-based albums. If you don't do this you will end up with duplicates.
 6. Click OK and move to the next step
 7. Select "Export once"
-8. Under "File type & size" I recommend increasing the file size to 50GB. **Important**: If your collection is larger than this (or you need to export it as multiple smaller archives) then you will need to **merge** the resultant folders together manually before using this tool. If you do this, be sure to merge the contents of any directories with the same name, rather than overwriting them.  
+8. Under "File type & size" I recommend increasing the file size to 50GB. **Important**: If your collection is larger than this (or you need to export it as multiple smaller archives) then you will need to **merge** the resultant folders together manually before using this tool. If you do this, be sure to merge the contents of any directories with the same name, rather than overwriting them.
 9. Click "Create Export", wait for a link to be sent by email and then download the zip file
-10. Extract the zip file into a directory. The path of this directory will be what we pass into the tool as the `inputDir`. 
-
-## What inputs do I need to provide?
-
-The tool takes in three parameters:
-
-1. an `inputDir` directory path containing the extracted Google Takeout. Required.
-2. an `outputDir` directory path where processed files will be moved to.
-3. an `errorDir` directory path where images with bad EXIF data that fail to process will be moved to.
-4. a `mockProcess` boolean parameter which allows the script to run on your files without any modification. It can help you to be sure that everything is going well.
-
-The `inputDir` needs to be a single directory containing an _extracted_ zip from Google takeout. As described in the section above, it is important that the zip has been extracted into a directory (this tool doesn't extract zips for you) and that it is a single folder containing the whole Takeout (or if coming from multiple archives, that they have been properly merged together). 
+10. Extract the zip file into a directory. The path of this directory will be what we pass into the tool as the `inputDir`.
 
 ## Configuring supported file types
 
 In order to avoid touching files that are not photos or videos, this tool will only process files whose extensions are whitelisted in the configuration options. Any other files will be ignored and not included in the output.
 
 To customise which files are processed, edit the `src/config.ts` file to suit your needs. For each extension you can also configure whether or not to attempt to read/write EXIF metadata for that file type.
-
-## What does the tool do?
-
-The tool will do the following:
-1. Find all "media files" with one of the supported extensions (see "Configuring supported file types" above) from the (nested) `inputDir` folder structure.
-  
-2. For each "media file":
-   
-   a. Look for a corresponding sidecar JSON metadata file (see the section below for more on this) and if found, read the `photoTakenTime` field
-   
-   b. Copy the media file to the output directory (if `outputDir` is present)
-   
-   c. If the file supports EXIF (e.g. JPEG images), read the EXIF metadata and write the `DateTimeOriginal` and geo locations fields if it does not already have a value in this field 
-
-   d. Update the file modification date to the `photoTakenTime` found in the JSON metadata or in EXIF metadata
-
-   e. If an error occurs whilst processing the file, copy it to the directory specified in the `errorDir` argument (if present), so that it can be inspected manually or removed
 
 ## How are media files matched to JSON sidecar files?
 
@@ -153,10 +147,11 @@ To support that, this tool will also check for files that have a number suffix i
 
 ## Disclaimer
 
-This tool was only written for the purpose of solving my own personal requirements. 
+This tool was only written for the purpose of solving my own personal requirements.
 
 I decided to make this public on GitHub because:
- - it was useful for me, so maybe it'll be useful for others in the future
- - future me might be thankful if I ever need to do this again
 
-With that said, please bear in mind that this tool won't be actively maintained and your mileage may vary. I'm sure it's far from perfect so if you choose to use it please proceed with caution and be careful to verify the results (with `mockProcess` parameter)! I hope it's helpful.
+-   it was useful for me, so maybe it'll be useful for others in the future
+-   future me might be thankful if I ever need to do this again
+
+With that said, please bear in mind that your mileage may vary. I'm sure it's far from perfect so if you choose to use it please proceed with caution and be careful to verify the results (i.e. with `mockProcess` parameter)! I hope it's helpful.
