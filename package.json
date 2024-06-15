@@ -1,36 +1,40 @@
 {
   "name": "google-photos-exif",
   "description": "A tool to populate missing EXIF metadata in Google Photos takeout, using Google's JSON metadata.",
-  "version": "2.2.1",
+  "version": "3.0.0",
   "author": "Matt Wilson @mattwilson1024",
-  "bin": {
-    "google-photos-exif": "./bin/run"
-  },
   "bugs": "https://github.com/mattwilson1024/google-photos-exif/issues",
   "dependencies": {
-    "@oclif/core": "^3.0.3",
-    "exiftool-vendored": "^23.3.0"
+    "@oclif/core": "^3.27.0",
+    "electron-squirrel-startup": "^1.0.1",
+    "exiftool-vendored": "^26.2.0"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-flatpak": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-zip": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
+    "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron-forge/plugin-vite": "^7.4.0",
+    "@electron/fuses": "^1.8.0",
     "@types/node": "^20.5.9",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
+    "electron": "^31.0.1",
+    "electron-winstaller": "^5.3.1",
     "eslint": "^8.8.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.25.4",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.1",
-    "tslib": "^2.6.2",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=20.14.0"
   },
-  "files": [
-    "/bin",
-    "/lib"
-  ],
   "homepage": "https://github.com/mattwilson1024/google-photos-exif",
   "keywords": [
     "oclif",
@@ -39,17 +43,21 @@
     "photos export"
   ],
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": ".vite/build/main.js",
   "oclif": {
     "bin": "google-photos-exif"
   },
   "repository": "mattwilson1024/google-photos-exif",
   "scripts": {
-    "eslint:fix": "eslint --fix --ext .ts ./src && prettier --write src/",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
+    "eslint:fix": "eslint --fix --ext .ts ./src && prettier --write ./src/",
+    "build:console": "vite build --config './vite.console.config.ts'",
     "test": "echo NO TESTS",
     "version": "oclif-dev readme && git add README.md",
-    "start": "./bin/run.js"
-  },
-  "types": "lib/index.d.ts"
+    "dev": "electron-forge start",
+    "package": "electron-forge package",
+    "build:ui:linux": "electron-forge make --platform linux",
+    "build:ui:windows": "electron-forge make --platform win32",
+    "build:ui": "npm run build:ui:windows && npm run build:ui:linux",
+    "start": "npm run build:console && node 'lib/console.js'"
+  }
 }

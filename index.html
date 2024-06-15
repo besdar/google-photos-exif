@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+        <link href="./src/index.css" rel="stylesheet" />
+        <title>Google photos exif</title>
+    </head>
+    <body>
+        <div class="content-wrapper">
+            <div class="form-wrapper">
+                <form class="form" action="#" id="configForm">
+                    <label>
+                        <span>Select google takeout folder</span>
+                        <input name="inputFolder" required type="text" placeholder="click to start choosing" />
+                    </label>
+                    <label>
+                        <span>Select output folder</span>
+                        <input name="outputFolder" required type="text" placeholder="click to start choosing" />
+                    </label>
+                    <label>
+                        <span>Select error output folder</span>
+                        <input name="errorOutputFolder" type="text" placeholder="click to start choosing" />
+                    </label>
+                    <label>
+                        <span>Mock process</span>
+                        <input name="mockProcess" type="checkbox" checked />
+                    </label>
+                    <input type="submit" />
+                </form>
+                <div class="execution-log"></div>
+            </div>
+
+            <div class="loader-wrapper hidden">
+                <div class="loader"></div>
+            </div>
+        </div>
+
+        <script defer type="module" src="./src/renderer.ts"></script>
+    </body>
+</html>

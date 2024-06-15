@@ -23,7 +23,7 @@ export async function findFilesWithExtensionRecursively(dirToSearch: string): Pr
 
     if (matchingFiles.length === 0) {
         throw new Error(
-            "The search directory is empty, so there is no work to do. Check that your --inputDir contains all of the Google Takeout data, and that any zips have been extracted before running this tool",
+            "The search directory is empty, so there is no work to do. Check that your --inputFolder contains all of the Google Takeout data, and that any zips have been extracted before running this tool",
         );
     }
 

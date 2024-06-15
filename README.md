@@ -18,35 +18,35 @@ A tool to populate missing EXIF metadata (like `DateTimeOriginal`, geolocation) 
 Example usage:
 
 ```
-npm i && npm run start -- --inputDir="~/takeout" --outputDir="~/output" --errorDir="~/error" --mockProcess
+npm i && npm run start -- --inputFolder="~/takeout" --outputFolder="~/output" --errorOutputFolder="~/error" --mockProcess
 ```
 
 The tool takes in three parameters:
 
-1. an `inputDir` directory path containing the extracted Google Takeout. Required.
-2. an `outputDir` directory path where processed files will be moved to.
-3. an `errorDir` directory path where images with bad EXIF data that fail to process will be moved to.
+1. an `inputFolder` directory path containing the extracted Google Takeout. Required.
+2. an `outputFolder` directory path where processed files will be moved to.
+3. an `errorOutputFolder` directory path where images with bad EXIF data that fail to process will be moved to.
 4. a `mockProcess` boolean parameter which allows the script to run on your files without any modification. It can help you make sure everything goes well.
 
-The `inputDir` needs to be a single directory containing an _extracted_ zip from Google takeout. As described in the section above, it is important that the zip has been extracted into a directory (this tool doesn't extract zips for you) and that it is a single folder containing the whole Takeout (or if coming from multiple archives, that they have been properly merged together).
+The `inputFolder` needs to be a single directory containing an _extracted_ zip from Google takeout. As described in the section above, it is important that the zip has been extracted into a directory (this tool doesn't extract zips for you) and that it is a single folder containing the whole Takeout (or if coming from multiple archives, that they have been properly merged together).
 
 ## How does this tool works?
 
 The tool will do the following:
 
-1. Find all "media files" with one of the supported extensions (see "Configuring supported file types" above) from the (nested) `inputDir` folder structure.
+1. Find all "media files" with one of the supported extensions (see "Configuring supported file types" above) from the (nested) `inputFolder` folder structure.
 
 2. For each "media file":
 
     a. Look for a corresponding sidecar JSON metadata file (see the section below for more on this) and if found, read the `photoTakenTime` field
 
-    b. Copy the media file to the output directory (if `outputDir` is present)
+    b. Copy the media file to the output directory (if `outputFolder` is present)
 
     c. If the file supports EXIF (e.g. JPEG images), read the EXIF metadata and write the `DateTimeOriginal` and geo locations fields if it does not already have a value in this field
 
     d. Update the file modification date to the `photoTakenTime` found in the JSON metadata or in EXIF metadata
 
-    e. If an error occurs whilst processing the file, copy it to the directory specified in the `errorDir` argument (if present), so that it can be inspected manually or removed
+    e. If an error occurs whilst processing the file, copy it to the directory specified in the `errorOutputFolder` argument (if present), so that it can be inspected manually or removed
 
 ## Background
 
@@ -109,7 +109,7 @@ The first step to using this tool is to request & download a `Google Takeout`. A
 7. Select "Export once"
 8. Under "File type & size" I recommend increasing the file size to 50GB. **Important**: If your collection is larger than this (or you need to export it as multiple smaller archives) then you will need to **merge** the resultant folders together manually before using this tool. If you do this, be sure to merge the contents of any directories with the same name, rather than overwriting them.
 9. Click "Create Export", wait for a link to be sent by email and then download the zip file
-10. Extract the zip file into a directory. The path of this directory will be what we pass into the tool as the `inputDir`.
+10. Extract the zip file into a directory. The path of this directory will be what we pass into the tool as the `inputFolder`.
 
 ## Configuring supported file types
 

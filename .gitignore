@@ -115,11 +115,13 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-
-
 # From OCLIF
 /lib
 /tmp
 
-
+# JetBrains IDE
 .idea
+
+# builds
+.vite/
+out/
