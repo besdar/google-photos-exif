@@ -1,5 +1,5 @@
-import { ProgramParameters } from "./photoExifSrc/models/types";
 import { contextBridge, ipcRenderer } from "electron";
+import { ProgramParameters } from "./photoExifSrc/models/types";
 
 contextBridge.exposeInMainWorld("API", {
     electron: () => process.versions.electron,

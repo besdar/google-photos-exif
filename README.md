@@ -96,7 +96,7 @@ There are some interesting challenges to note here:
 5. Whilst most of my images contained reasonable EXIF timestamps for the time they were taken (written by the phone's camera), a small number did not. My guess is that these images originated from other sources (e.g. they were shared with me or imported into the library by other means, and the source did not include a timestamp in the EXIF metadata)
 6. Some file formats such as GIFs or MP4 videos don't have this metadata and thus also get sorted into the wrong place when run through tools that organise images based on the metadata timestamps.
 
-## How to download Google Takeout content
+## [How to download Google Takeout content](https://support.google.com/accounts/answer/3024190)
 
 The first step to using this tool is to request & download a `Google Takeout`. At the time of writing the steps to do this are:
 
@@ -111,11 +111,9 @@ The first step to using this tool is to request & download a `Google Takeout`. A
 9. Click "Create Export", wait for a link to be sent by email and then download the zip file
 10. Extract the zip file into a directory. The path of this directory will be what we pass into the tool as the `inputFolder`.
 
-## Configuring supported file types
+## Supported file types
 
 In order to avoid touching files that are not photos or videos, this tool will only process files whose extensions are whitelisted in the configuration options. Any other files will be ignored and not included in the output.
-
-To customise which files are processed, edit the `src/config.ts` file to suit your needs. For each extension you can also configure whether or not to attempt to read/write EXIF metadata for that file type.
 
 ## How are media files matched to JSON sidecar files?
 

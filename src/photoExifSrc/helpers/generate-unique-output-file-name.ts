@@ -22,7 +22,7 @@ export function generateUniqueOutputFileName(filePath: string): string {
   let outputFileName = originalFileName;
   while (allUsedFileNamesLowerCased.includes(outputFileName.toLowerCase())) {
     outputFileName = `${originalFileNameWithoutExtension}_${counter}${originalFileExtension}`;
-    counter++;
+    counter += 1;
   }
 
   allUsedFileNamesLowerCased.push(outputFileName.toLowerCase());

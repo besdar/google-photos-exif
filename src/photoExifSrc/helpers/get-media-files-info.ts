@@ -1,5 +1,4 @@
 import { basename, extname, resolve } from "path";
-import { CONFIG } from "../config";
 import { MediaFileInfo, ProtoFile } from "../models/media-file-info";
 import { generateUniqueOutputFileName } from "./generate-unique-output-file-name";
 import { getCompanionJsonPathForMediaFile } from "./get-companion-json-path-for-media-file";

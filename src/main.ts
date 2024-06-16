@@ -1,7 +1,11 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, Menu } from "electron";
 import path from "path";
-import { executeGooglePhotosConversion } from "./photoExifSrc/utils";
+import { PROGRESS, executeGooglePhotosConversion } from "./photoExifSrc/utils";
 import { ProgramParameters } from "./photoExifSrc/models/types";
+
+app.disableHardwareAcceleration();
+
+let progressInterval: NodeJS.Timeout;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -9,15 +13,32 @@ if (require("electron-squirrel-startup")) {
 }
 
 const createWindow = () => {
-    ipcMain.handle("runPhotoConvertion", (_, formData: ProgramParameters) => executeGooglePhotosConversion(formData, formData.mockProcess));
+    Menu.setApplicationMenu(Menu.buildFromTemplate([
+        {
+            role: 'help',
+            submenu: [
+              {
+                label: 'Learn More',
+                click: () => {
+                  const { shell } = require('electron');
+    
+                  return shell.openExternal('https://github.com/besdar/google-photos-exif')
+                }
+              }
+            ]
+          }
+    ]));
 
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 300,
-        height: 300,
+        width: 370,
+        height: 500,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
         },
+        fullscreenable: false,
+        resizable: false,
+        icon: './src/icon.png'
     });
 
     // and load the index.html of the app.
@@ -28,7 +49,20 @@ const createWindow = () => {
     }
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
+
+    ipcMain.handle("runPhotoConvertion", (_, formData: ProgramParameters) => {
+        mainWindow.setProgressBar(0);
+
+        progressInterval = setInterval(() => {
+            mainWindow.setProgressBar(PROGRESS);
+        }, 100);
+
+        return executeGooglePhotosConversion(formData, formData.mockProcess).finally(() => {
+            clearInterval(progressInterval);
+            mainWindow.setProgressBar(-1);
+        });
+    });
 
     ipcMain.handle("dialog:openDirectory", async () => {
         const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
@@ -37,9 +71,8 @@ const createWindow = () => {
 
         if (canceled || !filePaths?.length) {
             return "";
-        } else {
-            return filePaths[0];
         }
+        return filePaths[0];
     });
 };
 
@@ -63,6 +96,11 @@ app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
+});
+
+// before the app is terminated, clear both timers
+app.on("before-quit", () => {
+    clearInterval(progressInterval);
 });
 
 // In this file you can include the rest of your app's specific main process

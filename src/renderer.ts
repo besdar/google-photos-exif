@@ -26,10 +26,10 @@ window.addEventListener("DOMContentLoaded", () => {
         
         const loader = document.getElementsByClassName('loader-wrapper')[0];
 
-        loader.classList.toggle('hidden')
+        loader.removeAttribute('hidden')
 
         return window.API.runPhotoConvertion(formObject).then(() => {
-            loader.classList.toggle('hidden')
+            loader.setAttribute('hidden', '')
         });
     });
 });

@@ -1,4 +1,6 @@
 import { existsSync, promises as fspromises, utimesSync } from "fs";
+import { exiftool } from "exiftool-vendored";
+import { resolve } from "path";
 import { CONFIG } from "./config";
 import { getMediaFilesInfo } from "./helpers/get-media-files-info";
 import { Directories } from "./models/types";
@@ -6,10 +8,10 @@ import { readMetadataFromGoogleJson } from "./helpers/read-metadata-from-google-
 import { findFilesWithExtensionRecursively } from "./helpers/find-files-with-extension-recursively";
 import { getMediaFileCountsByExtension } from "./helpers/get-media-file-counts-by-extension";
 import { MediaFileInfo, ProtoFile } from "./models/media-file-info";
-import { exiftool } from "exiftool-vendored";
-import { resolve } from "path";
 
 const { mkdir, copyFile } = fspromises;
+
+export let PROGRESS = 0
 
 const checkDirIsEmptyAndCreateDirIfNotFound = async (directoryPath?: string | null): Promise<void> => {
     if (!directoryPath) {
@@ -52,7 +54,8 @@ const updateModificationDate = (fileForUpdation: ProtoFile, dateString: string, 
 const processMediaFiles = async (mediaFiles: MediaFileInfo[], { errorOutputFolder }: Directories, mockProcess: boolean): Promise<void> => {
     console.log(`--- Processing media files ---`);
 
-    for (let i = 0; i < mediaFiles.length; i++) {
+    for (let i = 0; i < mediaFiles.length; i += 1) {
+        PROGRESS = i / mediaFiles.length;
         const { mediaFile, jsonFile, outputFile } = mediaFiles[i];
         console.log(`Processing file ${i} of ${mediaFiles.length}: ${mediaFile.path}`);
 
@@ -140,6 +143,8 @@ const processMediaFiles = async (mediaFiles: MediaFileInfo[], { errorOutputFolde
 }
 
 export const executeGooglePhotosConversion = async (directories: Directories, mockProcess = true) => {
+    PROGRESS = 0;
+
     try {
         if (!directories.inputFolder || !existsSync(directories.inputFolder)) {
             throw new Error("The input directory must exist");
@@ -155,4 +160,6 @@ export const executeGooglePhotosConversion = async (directories: Directories, mo
     } catch (error) {
         console.error(error as Error, { exit: 1 });
     }
+
+    PROGRESS = 1
 }

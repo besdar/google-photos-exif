@@ -5,34 +5,36 @@
         <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
         <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
         <link href="./src/index.css" rel="stylesheet" />
-        <title>Google photos exif</title>
+        <title>Google Photos EXIF tool</title>
+        <!-- <link rel="stylesheet" href="./node_modules/purecss/build/base-min.css" /> -->
+        <link rel="stylesheet" href="./node_modules/purecss/build/buttons-min.css" />
+        <link rel="stylesheet" href="./node_modules/purecss/build/forms-min.css" />
     </head>
     <body>
         <div class="content-wrapper">
+            <p>Takes in a directory path for an extracted Google Photos Takeout. Extracts all photo/video files (based on the conigured list of file extensions) and places them into an output directory. All files will have their modified timestamp set to match the timestamp specified in Google's JSON metadata files (where present). In addition, for file types that support EXIF, the EXIF "DateTimeOriginal" field will be set to the timestamp from Google's JSON metadata, if the field is not already set in the EXIF metadata.</p>
             <div class="form-wrapper">
-                <form class="form" action="#" id="configForm">
-                    <label>
-                        <span>Select google takeout folder</span>
-                        <input name="inputFolder" required type="text" placeholder="click to start choosing" />
-                    </label>
-                    <label>
-                        <span>Select output folder</span>
-                        <input name="outputFolder" required type="text" placeholder="click to start choosing" />
-                    </label>
-                    <label>
-                        <span>Select error output folder</span>
-                        <input name="errorOutputFolder" type="text" placeholder="click to start choosing" />
-                    </label>
-                    <label>
-                        <span>Mock process</span>
+                <form class="pure-form pure-form-stacked" action="#" id="configForm">
+                    <label for="inputFolder">Google photos takeout folder</label>
+                    <input name="inputFolder" required type="text" placeholder="click to start choosing" title="Directory containing the extracted contents of Google Photos Takeout zip file" />
+
+                    <label for="outputFolder">Output folder</label>
+                    <input name="outputFolder" required type="text" placeholder="click to start choosing" title="Directory into which the processed output will be written" />
+
+                    <label for="errorOutputFolder">Error output folder</label>
+                    <input name="errorOutputFolder" type="text" placeholder="click to start choosing" title="Directory for any files that have bad EXIF data - including the matching metadata files" />
+
+                    <label for="mockProcess">
                         <input name="mockProcess" type="checkbox" checked />
+                        <span>Mock process?</span>
                     </label>
-                    <input type="submit" />
+
+                    <button type="submit" class="pure-button pure-button-primary">Start process</button>
                 </form>
                 <div class="execution-log"></div>
             </div>
 
-            <div class="loader-wrapper hidden">
+            <div class="loader-wrapper" hidden>
                 <div class="loader"></div>
             </div>
         </div>

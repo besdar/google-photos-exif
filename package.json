@@ -1,13 +1,14 @@
 {
   "name": "google-photos-exif",
   "description": "A tool to populate missing EXIF metadata in Google Photos takeout, using Google's JSON metadata.",
-  "version": "3.0.0",
-  "author": "Matt Wilson @mattwilson1024",
-  "bugs": "https://github.com/mattwilson1024/google-photos-exif/issues",
+  "version": "3.0.1",
+  "author": "Beskov Dmitry @besdar",
+  "bugs": "https://github.com/besdar/google-photos-exif/issues",
   "dependencies": {
     "@oclif/core": "^3.27.0",
     "electron-squirrel-startup": "^1.0.1",
-    "exiftool-vendored": "^26.2.0"
+    "exiftool-vendored": "^26.2.0",
+    "purecss": "^3.0.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
@@ -35,7 +36,7 @@
   "engines": {
     "node": ">=20.14.0"
   },
-  "homepage": "https://github.com/mattwilson1024/google-photos-exif",
+  "homepage": "https://github.com/besdar/google-photos-exif",
   "keywords": [
     "oclif",
     "google takeout",
@@ -47,7 +48,7 @@
   "oclif": {
     "bin": "google-photos-exif"
   },
-  "repository": "mattwilson1024/google-photos-exif",
+  "repository": "besdar/google-photos-exif",
   "scripts": {
     "eslint:fix": "eslint --fix --ext .ts ./src && prettier --write ./src/",
     "build:console": "vite build --config './vite.console.config.ts'",

@@ -2,11 +2,6 @@ body {
     overflow: hidden;
 }
 
-.form {
-    display: grid;
-    gap: 10px;
-}
-
 .loader {
     border: 10px solid gainsboro;
     border-top: 10px solid deepskyblue;
@@ -34,10 +29,6 @@ body {
     height: 100%;
     opacity: 0.8;
     background-color: lightgray;
-}
-
-.hidden {
-    display: none;
 }
 
 @keyframes spin {

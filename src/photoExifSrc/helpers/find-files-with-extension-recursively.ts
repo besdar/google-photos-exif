@@ -1,6 +1,6 @@
 import { extname, resolve } from "path";
-import { CONFIG } from "../config";
 import { promises as fspromises } from "fs";
+import { CONFIG } from "../config";
 
 const { readdir } = fspromises;
 
