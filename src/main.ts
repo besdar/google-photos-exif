@@ -31,14 +31,14 @@ const createWindow = () => {
 
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 370,
+        width: 400,
         height: 500,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
         },
         fullscreenable: false,
         resizable: false,
-        icon: './src/icon.png'
+        icon: path.join(__dirname, "../renderer/main_window/assets/favicon-*.png")
     });
 
     // and load the index.html of the app.
