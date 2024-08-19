@@ -15,7 +15,10 @@ A tool to populate missing EXIF metadata (like `DateTimeOriginal`, geolocation) 
 
 ## Quick Start
 
-Example usage:
+### UI example:
+<Img width="200" src="./assets/Screenshot from 2024-08-19 18-57-59.png">
+
+### Console example usage:
 
 ```
 npm i && npm run start -- --inputFolder="~/takeout" --outputFolder="~/output" --errorOutputFolder="~/error" --mockProcess

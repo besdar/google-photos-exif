@@ -1,7 +1,7 @@
 {
   "name": "google-photos-exif",
   "description": "A tool to populate missing EXIF metadata in Google Photos takeout, using Google's JSON metadata.",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "author": "Beskov Dmitry @besdar",
   "bugs": "https://github.com/besdar/google-photos-exif/issues",
   "dependencies": {
